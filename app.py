@@ -440,9 +440,21 @@ def _aggregate_stats(job_id: int) -> dict:
                 ValidationResult.is_duplicate == False,  # noqa: E712
             ).group_by(ValidationResult.status)
         ).all()
+        status_key_map = {
+            "PENDING": "pending",
+            "DELIVERABILITY_LIKELY": "deliverability_likely",
+            "INVALID": "invalid",
+            "RISKY": "risky",
+            "CATCH_ALL": "catch_all",
+            "DISPOSABLE": "disposable",
+            "ROLE": "role",
+            "UNKNOWN": "unknown",
+            "ERROR": "error",
+        }
         for status, count in rows:
-            if status in counts:
-                counts[status] = count
+            key = status_key_map.get(status)
+            if key and key in counts:
+                counts[key] = count
         total = sum(counts.values())
         dup = (
             session.scalar(

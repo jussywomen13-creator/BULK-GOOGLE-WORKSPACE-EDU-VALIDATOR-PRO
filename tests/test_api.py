@@ -192,3 +192,4 @@ def test_deepseek_disabled(client, monkeypatch):
     data = res.get_json()
     assert data["available"] is False
     assert "report" in data
+    assert data["report"]["stats"]["deliverability_likely"] == 1
