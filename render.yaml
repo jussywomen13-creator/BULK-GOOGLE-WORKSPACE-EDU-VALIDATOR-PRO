@@ -7,8 +7,8 @@ services:
     startCommand: gunicorn -b 0.0.0.0:$PORT -w 1 --threads 8 -t 120 --access-logfile - --error-logfile - "app:create_app()"
     healthCheckPath: /health
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.2
+- key: PYTHON_VERSION
+  value: 3.13.5
       - key: HOST
         value: 0.0.0.0
       - key: MAX_CONTENT_LENGTH
