@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: bulk-email-validator-pro
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -b 0.0.0.0:$PORT -w 1 --threads 8 -t 120 --access-logfile - --error-logfile - "app:create_app()"
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.2
+      - key: HOST
+        value: 0.0.0.0
+      - key: MAX_CONTENT_LENGTH
+        value: "25165824"
+      - key: MAX_EMAILS_PER_JOB
+        value: "100000"
+      - key: JOB_BATCH_SIZE
+        value: "200"
+      - key: WORKER_CONCURRENCY
+        value: "8"
+      - key: DNS_TIMEOUT
+        value: "3"
+      - key: WORKER_RATE_LIMIT_PER_SECOND
+        value: "60"
+      - key: CORS_ORIGINS
+        value: "*"
+      # Set in Render dashboard to enable optional DeepSeek AI.
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      # For production persistent storage, set DATABASE_URL to a managed PostgreSQL URL.
+      - key: DATABASE_URL
+        sync: false

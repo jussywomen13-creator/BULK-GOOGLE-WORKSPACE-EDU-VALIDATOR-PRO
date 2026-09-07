@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bulk Email Validator Pro</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">EV</div>
+        <div>
+          <div class="brand-name">Bulk Email Validator</div>
+          <div class="brand-sub">PRO</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <button class="nav-item active" data-view="dashboard"><span class="ni">01</span> Dashboard</button>
+        <button class="nav-item" data-view="new"><span class="ni">02</span> New Validation Job</button>
+        <button class="nav-item" data-view="jobs"><span class="ni">03</span> Active Jobs</button>
+        <button class="nav-item" data-view="history"><span class="ni">04</span> Job History</button>
+        <button class="nav-item" data-view="results"><span class="ni">05</span> Results</button>
+        <button class="nav-item" data-view="export"><span class="ni">06</span> Export</button>
+        <button class="nav-item" data-view="settings"><span class="ni">07</span> Settings</button>
+        <button class="nav-item" data-view="ai"><span class="ni">08</span> AI Analysis</button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="status-dot"></div>
+        <span>Legitimate list hygiene only</span>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="menu-btn" id="menu-btn">☰</button>
+        <h1 id="view-title">Dashboard</h1>
+        <div class="topbar-actions">
+          <span class="pill" id="ai-status-pill">AI <span id="ai-state">...</span></span>
+          <span class="pill" id="server-pill">Server <span id="server-state">...</span></span>
+          <button class="btn btn-primary" data-go-new>New Job</button>
+        </div>
+      </header>
+
+      <section id="view-dashboard" class="view active">
+        <div class="metrics-grid" id="dashboard-metrics">
+          <div class="metric"><span class="m-label">Total Submitted</span><strong id="dm-submitted">—</strong></div>
+          <div class="metric"><span class="m-label">Unique Emails</span><strong id="dm-unique">—</strong></div>
+          <div class="metric"><span class="m-label">Processed</span><strong id="dm-processed">—</strong></div>
+          <div class="metric"><span class="m-label">Remaining</span><strong id="dm-remaining">—</strong></div>
+          <div class="metric"><span class="m-label">Deliverability Likely</span><strong id="dm-likely">—</strong></div>
+          <div class="metric"><span class="m-label">Invalid</span><strong id="dm-invalid">—</strong></div>
+          <div class="metric"><span class="m-label">Risky</span><strong id="dm-risky">—</strong></div>
+          <div class="metric"><span class="m-label">Catch-All</span><strong id="dm-catch">—</strong></div>
+          <div class="metric"><span class="m-label">Disposable</span><strong id="dm-disposable">—</strong></div>
+          <div class="metric"><span class="m-label">Role</span><strong id="dm-role">—</strong></div>
+          <div class="metric"><span class="m-label">Unknown</span><strong id="dm-unknown">—</strong></div>
+          <div class="metric"><span class="m-label">Errors</span><strong id="dm-errors">—</strong></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Latest Job Performance</h2>
+            <span class="muted">Live: <span id="live-progress">0%</span></span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="live-progress-bar" style="width:0%"></div></div>
+          <div class="panel-row">
+            <div><span class="muted">Processing speed</span><strong id="live-speed">0/s</strong></div>
+            <div><span class="muted">Estimated time remaining</span><strong id="live-eta">—</strong></div>
+            <div><span class="muted">Status</span><strong id="live-status">—</strong></div>
+            <div><span class="muted">Start time</span><strong id="live-start">—</strong></div>
+            <div><span class="muted">Complete time</span><strong id="live-end">—</strong></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>Recent Jobs</h2><button class="btn" data-go-jobs>View all</button></div>
+          <div class="table-wrap" id="recent-jobs"></div>
+        </div>
+      </section>
+
+      <section id="view-new" class="view">
+        <div class="panel">
+          <div class="panel-head"><h2>New Validation Job</h2></div>
+          <form id="new-job-form">
+            <label class="field">
+              <span>Job name</span>
+              <input name="name" placeholder="My list validation" />
+            </label>
+            <label class="field">
+              <span>Paste email list or text</span>
+              <textarea name="text" rows="10" placeholder="one@example.com&#10;two@company.com&#10;name <three@example.org>"></textarea>
+            </label>
+            <label class="field">
+              <span>Or upload TXT / CSV</span>
+              <input type="file" name="file" id="file-input" accept=".txt,.csv,.tsv" />
+            </label>
+            <div class="dropzone" id="dropzone">
+              <strong>Drag and drop a TXT / CSV / TSV file here</strong>
+              <span class="muted">or click below to choose a file</span>
+              <button type="button" class="btn" id="dropzone-pick">Choose file</button>
+              <span class="muted" id="dropzone-file">No file selected</span>
+            </div>
+            <div class="field-row">
+              <label class="field small"><span>Concurrency</span><input name="concurrency" type="number" min="1" max="32" value="8" /></label>
+              <label class="field small"><span>Batch size</span><input name="batch_size" type="number" min="1" max="1000" value="200" /></label>
+              <label class="field small"><span>DNS timeout (s)</span><input name="dns_timeout" type="number" min="1" max="15" value="3" /></label>
+            </div>
+            <div class="actions">
+              <button type="submit" class="btn btn-primary" id="submit-new">Create & Start Job</button>
+              <span class="muted" id="new-job-status"></span>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section id="view-jobs" class="view">
+        <div class="panel">
+          <div class="panel-head"><h2>Active Jobs</h2><button class="btn" id="refresh-jobs">Refresh</button></div>
+          <div class="table-wrap" id="jobs-table"></div>
+        </div>
+      </section>
+
+      <section id="view-history" class="view">
+        <div class="panel">
+          <div class="panel-head"><h2>Job History</h2><button class="btn" id="refresh-history">Refresh</button></div>
+          <div class="table-wrap" id="history-table"></div>
+        </div>
+      </section>
+
+      <section id="view-results" class="view">
+        <div class="panel">
+          <div class="panel-head"><h2>Results</h2>
+            <div class="controls">
+              <select id="result-job-select"></select>
+              <button class="btn" id="refresh-results">Refresh</button>
+            </div>
+          </div>
+          <div class="filters">
+            <input id="result-search" placeholder="Search email/domain/reason" />
+            <select id="result-status"></select>
+            <input id="result-domain" placeholder="Filter domain" />
+            <select id="result-page-size"><option>25</option><option selected>50</option><option>100</option></select>
+          </div>
+          <div class="table-wrap" id="results-table"></div>
+          <div class="pagination" id="results-pagination"></div>
+          <div class="actions">
+            <button class="btn" id="copy-selected">Copy selected</button>
+            <button class="btn" id="export-selected">Export selected</button>
+            <label class="select-label"><input type="checkbox" id="select-all" /> Select all</label>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-export" class="view">
+        <div class="panel">
+          <div class="panel-head"><h2>Export</h2>
+            <div class="controls">
+              <select id="export-job-select"></select>
+              <button class="btn" id="refresh-export">Refresh</button>
+            </div>
+          </div>
+          <div class="export-grid" id="export-grid"></div>
+        </div>
+      </section>
+
+      <section id="view-settings" class="view">
+        <div class="panel">
+          <div class="panel-head"><h2>Settings</h2></div>
+          <div class="settings-grid">
+            <div><span class="muted">DeepSeek API key</span><strong id="setting-ai">Not configured</strong></div>
+            <div><span class="muted">Database</span><strong id="setting-db">SQLite (local)</strong></div>
+            <div><span class="muted">Max content length</span><strong id="setting-upload">—</strong></div>
+            <div><span class="muted">Batch size</span><strong id="setting-batch">—</strong></div>
+            <div><span class="muted">Concurrency</span><strong id="setting-conc">—</strong></div>
+            <div><span class="muted">Rate limit / second</span><strong id="setting-rate">—</strong></div>
+          </div>
+          <p class="note">All values are set by environment variables. Local settings are not stored client-side.</p>
+        </div>
+      </section>
+
+      <section id="view-ai" class="view">
+        <div class="panel">
+          <div class="panel-head"><h2>AI Analysis</h2>
+            <div class="controls">
+              <select id="ai-job-select"></select>
+              <button class="btn btn-primary" id="run-ai">Run Analysis</button>
+            </div>
+          </div>
+          <p class="muted">DeepSeek is optional. The validator works without it and never sends credentials or raw mailbox login data.</p>
+          <pre id="ai-output" class="ai-output">Select a job and run analysis.</pre>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div id="toast" class="toast"></div>
+  <script>window.AI_ENABLED = {{ 'true' if ai_enabled else 'false' }};</script>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
