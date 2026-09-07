@@ -138,6 +138,7 @@ layer is SQLAlchemy Core/ORM, so PostgreSQL can be used by setting
 
 ```bash
 . .venv/bin/activate
+pip install -r requirements-dev.txt
 pytest -q
 ```
 
